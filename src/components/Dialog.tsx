@@ -1,6 +1,7 @@
 import { cx } from 'class-variance-authority';
-import { MessageType } from '../types';
+import { useEffect, useRef } from 'react';
 import { ThreeDots } from 'react-loader-spinner';
+import { MessageType } from '../types';
 
 const Message: React.FC<{ message: MessageType }> = ({ message }) => {
   const containerClass = cx('flex w-full', {
@@ -36,12 +37,23 @@ const Message: React.FC<{ message: MessageType }> = ({ message }) => {
   );
 };
 
-const Dialog: React.FC<{ dialog: MessageType[] }> = ({ dialog }) => (
-  <div className='flex flex-col gap-y-8 p-3'>
-    {dialog.map((message, index) => (
-      <Message key={index} message={message} />
-    ))}
-  </div>
-);
+const Dialog: React.FC<{ dialog: MessageType[] }> = ({ dialog }) => {
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [dialog]);
+
+  return (
+    <div className='flex flex-col gap-y-8 p-3'>
+      {dialog.map((message, index) => (
+        <Message key={index} message={message} />
+      ))}
+      <div ref={bottomRef} />
+    </div>
+  );
+};
 
 export default Dialog;
