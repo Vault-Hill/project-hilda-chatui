@@ -1,11 +1,19 @@
 import { cx } from 'class-variance-authority';
-import { useEffect, useRef } from 'react';
+import { useAtom } from 'jotai';
+import React, { forwardRef, useEffect, useRef } from 'react';
 import { ThreeDots } from 'react-loader-spinner';
+import { dialogAtom } from '../state/atoms';
 import { MessageType } from '../types';
 
-const Message: React.FC<{ message: MessageType }> = ({ message }) => {
+type Message = {
+  message: MessageType;
+  isLast?: boolean;
+};
+
+const Message = forwardRef<HTMLDivElement, Message>(({ message, isLast }, ref) => {
   const containerClass = cx('flex w-full', {
     'justify-start rounded-md': message.role === 'assistant',
+    "animate-pop": message.role === 'assistant' && isLast && !message.typing,
     'justify-end rounded-md': message.role === 'user',
   });
 
@@ -14,44 +22,52 @@ const Message: React.FC<{ message: MessageType }> = ({ message }) => {
     'rounded-b-xl rounded-tl-xl bg-slate-100': message.role === 'user',
   });
 
-  const isTyping = !message.message && message.role === 'assistant';
+  const nowTyping = message.typing && isLast;
+  const wasTyping = message.typing && !isLast;
+
+  if (wasTyping) return null;
 
   return (
-    <div className={containerClass}>
+    <section className={containerClass} ref={isLast ? ref : undefined}>
       <span className={itemClass}>
-        {isTyping ? (
+        {nowTyping ? (
           <ThreeDots
-            height='30'
-            width='30'
-            radius='9'
+            height='20'
+            width='20'
+            radius='5'
             color='white'
             ariaLabel='three-dots-loading'
-            wrapperStyle={{}}
             visible={true}
           />
         ) : (
           message.message
         )}
       </span>
-    </div>
+    </section>
   );
-};
+});
 
-const Dialog: React.FC<{ dialog: MessageType[] }> = ({ dialog }) => {
-  const bottomRef = useRef<HTMLDivElement>(null);
+const Dialog: React.FC = () => {
+  const [dialog] = useAtom(dialogAtom);
+
+  const lastMessageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [dialog]);
 
   return (
     <div className='flex flex-col gap-y-8 p-3'>
-      {dialog.map((message, index) => (
-        <Message key={index} message={message} />
+      {dialog.map((message, index, arr) => (
+        <Message
+          key={index}
+          message={message}
+          isLast={index === arr.length - 1}
+          ref={lastMessageRef}
+        />
       ))}
-      <div ref={bottomRef} />
     </div>
   );
 };

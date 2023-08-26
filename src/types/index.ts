@@ -14,6 +14,7 @@ export type MessageType = {
   timestamp?: string;
   role: string;
   message?: string;
+  typing?: boolean;
 };
 
 export type Command = { action: 'prompt'; message: string };

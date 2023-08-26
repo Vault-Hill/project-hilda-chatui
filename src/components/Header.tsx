@@ -1,11 +1,12 @@
-import { cx } from 'class-variance-authority';
 import { useAtom } from 'jotai';
 import { Radio } from 'react-loader-spinner';
 import avatar from '../assets/avatar.png';
-import { sessionAtom } from '../state/atoms';
+import disconnIcon from '../assets/disconn-icon.svg';
+import { connectionAtom } from '../state/atoms';
 
 const Header: React.FC = () => {
-  const [session] = useAtom(sessionAtom);
+  const [{connected, timedOut}] = useAtom(connectionAtom);
+
   return (
     <>
       <div className='flex justify-between items-center p-4 sticky top-0 bg-[#111827]'>
@@ -16,16 +17,17 @@ const Header: React.FC = () => {
           <div className='flex flex-col justify-between'>
             <h1 className='font-bold text-xl text-white'>Ask Hilda</h1>
 
-            <div className={cx({ invisible: !session.connected })}>
+            {connected ? (
               <Radio
                 visible={true}
                 height='20'
                 width='20'
                 ariaLabel='radio-loading'
-                wrapperStyle={{}}
                 wrapperClass='radio-wrapper'
               />
-            </div>
+            ) : (
+              <img src={disconnIcon} className='h-5 w-5' alt='' />
+            )}
           </div>
         </div>
         {/* <div className='flex h-full'>
@@ -34,7 +36,7 @@ const Header: React.FC = () => {
       </button>
     </div> */}
       </div>
-      {!session.connected && <p className='text-gray-100 text-center'>Connecting...</p>}
+      {!connected && !timedOut && <p className='text-gray-100 text-center'>Connecting...</p>}
     </>
   );
 };

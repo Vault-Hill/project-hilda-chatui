@@ -12,3 +12,16 @@
     #f9c294 95.97%
   );
 }
+
+@keyframes pop {
+  0% {
+    transform: translateX(-100%) scale(0.5);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+.animate-pop {
+  animation: pop 0.2s;
+}
