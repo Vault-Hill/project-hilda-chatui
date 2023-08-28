@@ -9,7 +9,7 @@ const ChatUI = () => {
   createConnection();
 
   return (
-    <div className='max-w-lg rounded-t-2xl relative border border-gray-300 mx-auto h-[45rem] flex flex-col justify-between overflow-scroll bg-[#111827] shadow-2xl'>
+    <div className='max-w-lg rounded-t-2xl relative border border-gray-300 mx-auto h-[45rem] flex flex-col justify-between overflow-y-scroll bg-[#111827] shadow-2xl'>
       <div>
         <Header />
         <Dialog />
