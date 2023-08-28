@@ -1,3 +1,4 @@
+import { cx } from 'class-variance-authority';
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { Bars } from 'react-loader-spinner';
@@ -92,14 +93,17 @@ const Input: React.FC = () => {
                 />
               </div>
             ) : (
-              <img src={micOffIcon} className='h-8 w-5 mb-2 mr-2' alt='' />
+              <img src={micOffIcon} className='h-10 w-8 my-1 mr-1 bg-blue-300 border border-blue-600 shadow-lg rounded p-1' alt='' />
             )}
           </button>
 
           <button
             type='submit'
             onClick={handleSubmit}
-            className='p-2 w-14 h-10 flex items-center justify-center shadow-xl my-1 mr-1 rounded-md vh-gradient hover:scale-95'
+            className={cx(
+              'w-14 my-1 h-10 flex items-center justify-center shadow-xl mr-1 rounded-md  hover:scale-95 ',
+              { 'vh-gradient opacity-50': input.length < 1, 'vh-gradient': input.length > 0 },
+            )}
           >
             <img src={sendIcon} className='h-5 w-5' alt='send icon' />
           </button>
