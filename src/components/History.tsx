@@ -7,7 +7,7 @@ const History = () => {
   const [{ connected, reconnect, timedOut }] = useAtom(connectionAtom);
 
   return (
-    <div className="flex flex-col gap-5 h-[80vh] w-80">
+    <div className="flex-col gap-5 h-[80vh] w-80 hidden md:flex">
       {!connected && timedOut && (
         <div className="flex justify-center group">
           <button
@@ -19,13 +19,13 @@ const History = () => {
         </div>
       )}
       <div className="dark:bg-[#ffffff08] bg-[#00000015] border rounded-lg dark:border-[#ffffff26] border-[#00000026] flex-grow">
-        <div className="p-7 border-b dark:border-[#ffffff26] border-[#00000026] flex items-center gap-2 ">
+        <div className="p-5 border-b dark:border-[#ffffff26] border-[#00000026] flex items-center gap-2 ">
           <img src={historyIcon} className="w-5 h-5 filter dark:invert-[100%]" alt="" />
-          <p className="dark:text-white text-black text-[16px] font-bold">History</p>
+          <p className="dark:text-white text-black text-[16px] font-semibold">History</p>
         </div>
         <div className="flex gap-2 p-5">
-          <img src={chatIcon} className="w-3 h-3 filter dark:invert-[100%]" alt="" />
-          <p className="dark:text-white text-black text-[11px] font-bold">
+          <img src={chatIcon} className="w-5 h-5 filter dark:invert-[100%]" alt="" />
+          <p className="dark:text-white text-black text-[13px] font-bold">
             Your chat history will appear here
           </p>
         </div>

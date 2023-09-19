@@ -61,7 +61,7 @@ const Dialog: React.FC = () => {
   }, [dialog]);
 
   return (
-    <div className="flex flex-col gap-y-8 p-3 h-[75%] overflow-y-scroll scrollbar-hide">
+    <div className="flex flex-col gap-y-8 p-3  md:px-6 h-[75%] overflow-y-scroll scrollbar-hide">
       {dialog.map((message, index, arr) => (
         <Message
           key={index}
