@@ -20,7 +20,7 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
   let socket = get(socketAtom);
 
   const setup = () => {
-    // console.log('connecting...');
+    console.log('connecting...',import.meta.env.VITE_WS_CONN_URL);
     set(connectionAtom, {});
     socket = new WebSocket(import.meta.env.VITE_WS_CONN_URL);
     set(socketAtom, socket);

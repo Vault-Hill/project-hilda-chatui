@@ -1,8 +1,10 @@
 import ChatUI from './components/ChatUI';
+import Nav from './components/Nav';
 
 function App() {
   return (
-    <div className='bg-slate-50 h-screen md:pt-20 md:px-2'>
+    <div className='h-screen bg-slate-50 dark:bg-black flex flex-col items-center'>
+      <Nav/>
       <ChatUI />
     </div>
   );
