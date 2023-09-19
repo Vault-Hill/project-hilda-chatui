@@ -20,7 +20,7 @@ const Input: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    messenger?.send({
+   if(input.trim().length > 0) messenger?.send({
       action: 'prompt',
       message: input,
     });
@@ -44,8 +44,8 @@ const Input: React.FC = () => {
   }, [transcript, interim]);
 
   return (
-    <div className='sticky bottom-0 rounded-lg overflow-hidden  h-fit flex-grow'>
-      <div className='flex gap-5 h-fit m-5  items-center'>
+    <div className='sticky bottom-0 rounded-lg overflow-hidden  h-fit '>
+      <div className='flex gap-1 md:gap-5 h-fit m-2 md:m-5  items-center'>
         {listening ? (
           <p className='flex-1 w-full pl-2'>
             {input}
@@ -64,7 +64,7 @@ const Input: React.FC = () => {
           />
         )}
 
-        <div className='flex items-center gap-5'>
+        <div className='flex items-center gap-1 md:gap-5'>
           <button type='button' onClick={toggleListening}>
             {listening ? (
               <div >
@@ -85,11 +85,11 @@ const Input: React.FC = () => {
             type='submit'
             onClick={handleSubmit}
             className={cx(
-              'w-24 my-1 h-12 flex items-center justify-center gap-3 shadow-xl mr-1 rounded-md  hover:scale-95 ',
-              { 'bg-[#FFDA4D] opacity-50': input.length < 1, 'bg-[#FFDA4D]': input.length > 0 },
+              'w-12 md:w-24 h-12 flex items-center justify-center gap-3 shadow-xl mr-1 rounded-md  hover:scale-95 ',
+              { 'bg-[#FFDA4D] cursor-not-allowed': input.length < 1, 'bg-[#FFDA4D]': input.length > 0 },
             )}
           >
-            <span className='text-4'>Send</span>
+            <span className='text-4 hidden md:block'>Send</span>
             <img src={sendIcon} className='h-4 w-4' alt='send icon' />
           </button>
         </div>
