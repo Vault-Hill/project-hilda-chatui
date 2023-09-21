@@ -25,7 +25,7 @@ const History = () => {
         </div>
         <div className="flex gap-2 p-5">
           <img src={chatIcon} className="w-5 h-5 filter dark:invert-[100%]" alt="" />
-          <p className="dark:text-white text-black text-[13px] font-bold">
+          <p className="dark:text-white text-black text-sm">
             Your chat history will appear here
           </p>
         </div>

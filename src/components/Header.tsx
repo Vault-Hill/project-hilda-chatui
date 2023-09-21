@@ -1,15 +1,16 @@
 import { useAtom } from 'jotai';
 import { Radio } from 'react-loader-spinner';
 import avatar from '../assets/avatar.png';
-import disconnIcon from '../assets/disconn-icon.svg';
+import cancelIcon from '../assets/cancel.svg';
+import wifiIcon from '../assets/wifi.svg';
 import { connectionAtom } from '../state/atoms';
 
 const Header: React.FC = () => {
-  const [{connected, timedOut}] = useAtom(connectionAtom);
+  const [{ connected, timedOut }] = useAtom(connectionAtom);
 
   return (
     <>
-      <div className='flex justify-between items-center p-4 sticky top-0'>
+      <div className='flex justify-between items-center p-4 sticky top-0 mb-5'>
         <div className='flex items-center gap-5'>
           <div className='w-14 h-14 rounded-full overflow-hidden bg-gray-100'>
             <img src={avatar} alt='avatar' />
@@ -26,7 +27,10 @@ const Header: React.FC = () => {
                 wrapperClass='radio-wrapper'
               />
             ) : (
-              <img src={disconnIcon} className='h-5 w-5' alt='' />
+              <div className='relative'>
+                <img src={wifiIcon} className='h-5 w-5 dark:invert-[100%]' alt='' />
+                <img src={cancelIcon} className='h-5 w-5 absolute top-0' alt='' />
+              </div>
             )}
           </div>
         </div>
@@ -36,7 +40,9 @@ const Header: React.FC = () => {
       </button>
     </div> */}
       </div>
-      {!connected && !timedOut && <p className='dark:text-white text-black text-center'>Connecting...</p>}
+      {!connected && !timedOut && (
+        <p className='dark:text-white text-black text-center'>Connecting...</p>
+      )}
     </>
   );
 };

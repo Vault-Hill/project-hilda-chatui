@@ -7,9 +7,9 @@ recognition.continuous = true;
 recognition.interimResults = true;
 
 const useSpeechRecognition = () => {
-  const [listening, setListening] = useState<boolean>(false);
-  const [transcript, setTranscript] = useState<string>('');
-  const [interim, setInterim] = useState<string>('');
+  const [listening, setListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [interim, setInterim] = useState('');
 
   useEffect(() => {
     if (listening) {

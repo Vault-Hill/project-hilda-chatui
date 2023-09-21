@@ -1,16 +1,15 @@
-import { cx } from 'class-variance-authority';
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { Bars } from 'react-loader-spinner';
 import micOffIcon from '../assets/mic-off.svg';
 import sendIcon from '../assets/send-icon.svg';
 import { capitalize } from '../helpers';
+import useSpeechRecognition from '../hooks/useSpeechRecognition';
 import { connectionAtom } from '../state/atoms';
-import useSpeechRecognition from './hooks/useSpeechRecognition';
 
 const Input: React.FC = () => {
-  const [input, setInput] = useState<string>('');
-  const [filler, setFiller] = useState<string>('');
+  const [input, setInput] = useState('');
+  const [filler, setFiller] = useState('');
   const [{ messenger }] = useAtom(connectionAtom);
 
   const { listening, toggleListening, transcript, interim } = useSpeechRecognition();
@@ -20,10 +19,11 @@ const Input: React.FC = () => {
   };
 
   const handleSubmit = () => {
-   if(input.trim().length > 0) messenger?.send({
-      action: 'prompt',
-      message: input,
-    });
+    if (input.trim().length > 0)
+      messenger?.send({
+        action: 'prompt',
+        message: input,
+      });
     setInput('');
   };
 
@@ -44,55 +44,57 @@ const Input: React.FC = () => {
   }, [transcript, interim]);
 
   return (
-    <div className='sticky bottom-0 rounded-lg overflow-hidden  h-fit '>
-      <div className='flex gap-1 md:gap-5 h-fit m-2 md:m-5  items-center'>
-        {listening ? (
-          <p className='flex-1 w-full pl-2'>
-            {input}
-            <span className='text-gray-400 ml-1'>
-              {filler.length < 1 && input.length < 1 ? 'Listening...' : filler}
-            </span>
-          </p>
-        ) : (
-          <textarea
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            value={input}
-            className='flex-1 p-2 outline-none h-12 overflow-hidden resize-none rounded-xl dark:bg-[#ffffff26] border bg-[#f5f5f599] dark:border-[#ffffff26] border-[#00000026] dark:text-white text-black placeholder:align-middle' 
-            placeholder='Enter a message here'
-    
-          />
-        )}
+    <div className='sticky bottom-0 flex gap-1 md:gap-5 h-fit m-2 md:m-5 items-end'>
+      {listening ? (
+        <p className='flex-1 h-max w-full p-[12px] overflow-hidden resize-none rounded-lg dark:bg-neutral-800 border bg-neutral-50 dark:border-gray-600 border-gray-300 dark:text-white'>
+          {input}
+          <span className='text-gray-400 ml-1'>
+            {filler.length < 1 && input.length < 1 ? 'Listening...' : filler}
+          </span>
+        </p>
+      ) : (
+        <textarea
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          value={input}
+          rows={1}
+          tabIndex={0}
+          spellCheck={false}
+          className='flex-1 p-[13px] outline-none overflow-hidden rounded-lg dark:bg-neutral-800 border bg-neutral-50 dark:border-gray-600 border-gray-300 dark:text-white text-black resize-none'
+          placeholder='Send a message'
+          ref={(textarea) => {
+            if (textarea) {
+              textarea.style.height = `${textarea.scrollHeight}px`;
+              textarea.style.maxHeight = '200px';
+              textarea.addEventListener('input', () => {
+                textarea.style.height = 'auto';
+                textarea.style.height = `${textarea.scrollHeight}px`;
+              });
+            }
+          }}
+        />
+      )}
 
-        <div className='flex items-center gap-1 md:gap-5'>
-          <button type='button' onClick={toggleListening}>
-            {listening ? (
-              <div >
-                <Bars
-                  height='20'
-                  width='40'
-                  color='#ffcb0580'
-                  ariaLabel='bars-loading'
-                  visible={true}
-                />
-              </div>
-            ) : (
-              <img src={micOffIcon} className='h-8 w-6' alt='' />
-            )}
-          </button>
+      <div className='flex items-center gap-1 md:gap-5'>
+        <button type='button' onClick={toggleListening}>
+          {listening ? (
+            <div>
+              <Bars height='20' width='40' color='green' ariaLabel='bars-loading' visible={true} />
+            </div>
+          ) : (
+            <img src={micOffIcon} className='h-8 w-8 mx-1' alt='' />
+          )}
+        </button>
 
-          <button
-            type='submit'
-            onClick={handleSubmit}
-            className={cx(
-              'w-12 md:w-24 h-12 flex items-center justify-center gap-3 shadow-xl mr-1 rounded-md  hover:scale-95 ',
-              { 'bg-[#FFDA4D] cursor-not-allowed': input.length < 1, 'bg-[#FFDA4D]': input.length > 0 },
-            )}
-          >
-            <span className='text-4 hidden md:block'>Send</span>
-            <img src={sendIcon} className='h-4 w-4' alt='send icon' />
-          </button>
-        </div>
+        <button
+          type='submit'
+          disabled={input.length < 1}
+          onClick={handleSubmit}
+          className='w-12 md:w-24 h-12 flex items-center justify-center gap-3 bg-yellow-300 shadow-xl mr-1 rounded-md  hover:bg-yellow-400 disabled:hover:bg-yellow-300 disabled:cursor-not-allowed'
+        >
+          <span className='text-4 hidden md:block'>Send</span>
+          <img src={sendIcon} className='h-4 w-4' alt='send icon' />
+        </button>
       </div>
     </div>
   );
