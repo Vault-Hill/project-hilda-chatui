@@ -5,8 +5,13 @@ import cancelIcon from '../assets/cancel.svg';
 import wifiIcon from '../assets/wifi.svg';
 import { connectionAtom } from '../state/atoms';
 
-const Header: React.FC = () => {
-  const [{ connected, timedOut }] = useAtom(connectionAtom);
+type Props = {
+  agentName: string;
+  logoUrl?: string;
+};
+
+const Header: React.FC<Props> = ({ agentName }) => {
+  const [{ connected }] = useAtom(connectionAtom);
 
   return (
     <>
@@ -16,7 +21,7 @@ const Header: React.FC = () => {
             <img src={avatar} alt='avatar' />
           </div>
           <div className='flex flex-col justify-between'>
-            <h1 className='font-bold text-xl dark:text-white text-black'>Ask Hilda</h1>
+            <h1 className='font-bold text-xl dark:text-white text-black'>Ask {agentName}</h1>
 
             {connected ? (
               <Radio
@@ -40,9 +45,6 @@ const Header: React.FC = () => {
       </button>
     </div> */}
       </div>
-      {!connected && !timedOut && (
-        <p className='dark:text-white text-black text-center'>Connecting...</p>
-      )}
     </>
   );
 };

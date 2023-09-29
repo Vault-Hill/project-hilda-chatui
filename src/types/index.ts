@@ -8,6 +8,8 @@ export type ChatEvent = {
   action: string;
   orgId: string;
   data: EventData;
+  agentName: string;
+  logoUrl: string;
 };
 
 export type MessageType = {

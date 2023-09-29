@@ -5,6 +5,8 @@ import { Command, MessageType, Messenger } from '../types';
 
 type Connection = {
   orgId?: string;
+  agentName?: string;
+  logoUrl?: string;
   connected?: boolean;
   timedOut?: boolean;
   reconnect?: () => void;
@@ -12,22 +14,26 @@ type Connection = {
   messenger?: Messenger;
 };
 
-export const dialogAtom = atom<MessageType[]>([]);
+export const messageAtom = atom<MessageType[]>([]);
+export const accessKeyAtom = atomWithStorage<string>('acc_key', '');
 export const connectionAtom = atomWithStorage<Connection>('connection', {});
 const socketAtom = atom<WebSocket | null>(null);
 
 export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
   let socket = get(socketAtom);
+  const searchParams = new URLSearchParams(document.location.search);
+  set(accessKeyAtom, searchParams.get('token') || '');
+  const accessKey = get(accessKeyAtom);
 
   const setup = () => {
     // console.log('connecting...');
     set(connectionAtom, {});
-    socket = new WebSocket(import.meta.env.VITE_WS_CONN_URL);
+    socket = new WebSocket(`${import.meta.env.VITE_WS_CONN_URL}?acc_key=${accessKey}`);
     set(socketAtom, socket);
 
     socket.onopen = () => {
       // console.log('connected');
-      set(dialogAtom, []);
+      set(messageAtom, []);
       set(connectionAtom, { connected: true, reconnect, disconnect, messenger });
     };
 
@@ -40,14 +46,14 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
       const data = processEvent(event);
 
       if (data) {
-        const { message, orgId, role, timestamp } = data;
+        const { message, orgId, agentName, logoUrl, role, timestamp } = data;
 
         if (!message) {
-          set(dialogAtom, (prev) => prev.slice(0, -1));
+          set(messageAtom, (prev) => prev.slice(0, -1));
           return;
         }
 
-        set(connectionAtom, (prev) => ({ ...prev, orgId }));
+        set(connectionAtom, (prev) => ({ ...prev, orgId, agentName, logoUrl }));
 
         const response: MessageType = {
           timestamp,
@@ -55,7 +61,7 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
           message,
         };
 
-        set(dialogAtom, (prev) => [...prev, response]);
+        set(messageAtom, (prev) => [...prev, response]);
       }
     };
 
@@ -80,7 +86,7 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
           data: { message: command.message },
         };
 
-        set(dialogAtom, (prev) => [...prev, message, typing]);
+        set(messageAtom, (prev) => [...prev, message, typing]);
         socket?.send(JSON.stringify(query));
       },
     };
