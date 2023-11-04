@@ -5,6 +5,8 @@ import { Command, MessageType, Messenger } from '../types';
 
 type Connection = {
   orgId?: string;
+  totalDislikes?: number;
+  escalation?: string;
   agentName?: string;
   logoUrl?: string;
   connected?: boolean;
@@ -46,7 +48,7 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
       const data = processEvent(event);
 
       if (data) {
-        const { message, orgId, agentName, logoUrl, role, timestamp } = data;
+        const { message, orgId, sessionId, agentName, logoUrl, role, timestamp } = data;
 
         if (!message) {
           set(messageAtom, (prev) => prev.slice(0, -1));
@@ -56,6 +58,8 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
         set(connectionAtom, (prev) => ({ ...prev, orgId, agentName, logoUrl }));
 
         const response: MessageType = {
+          orgId,
+          sessionId,
           timestamp,
           role,
           message,
@@ -67,7 +71,7 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
 
     const messenger = {
       send: (command: Command) => {
-        const { orgId } = get(connectionAtom);
+        const { orgId, totalDislikes, agentName, escalation } = get(connectionAtom);
 
         const message: MessageType = {
           timestamp: new Date().toISOString(),
@@ -83,10 +87,27 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
         const query = {
           action: command.action,
           orgId,
+          agentName,
+          escalation,
+          totalDislikes,
           data: { message: command.message },
         };
 
         set(messageAtom, (prev) => [...prev, message, typing]);
+        socket?.send(JSON.stringify(query));
+      },
+      escalate: (command: Command) => {
+        const { orgId, agentName, escalation } = get(connectionAtom);
+
+        const query = {
+          action: command.action,
+          orgId,
+          agentName,
+          escalation: escalation ?? 'Level 1',
+          data: { message: command.message },
+        };
+
+        set(connectionAtom, (prev) => ({ ...prev, escalation: query.escalation }));
         socket?.send(JSON.stringify(query));
       },
     };
