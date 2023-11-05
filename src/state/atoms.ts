@@ -42,6 +42,15 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
     socket.onclose = () => {
       // console.log('disconnected');
       set(connectionAtom, (prev) => ({ ...prev, connected: false, timedOut: true }));
+
+      const response: MessageType = {
+        timestamp: new Date().toISOString(),
+        role: 'assistant',
+        message:
+          "As you're no longer asking questions, I'll go ahead and close the session. Feel free to reach out later if you have more inquiries or need assistance. Thank you for using our service.",
+      };
+
+      set(messageAtom, (prev) => [...prev, response]);
     };
 
     socket.onmessage = (event) => {

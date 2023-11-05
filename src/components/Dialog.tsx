@@ -13,10 +13,11 @@ type Message = {
   createFeedback: (data: unknown) => void;
   isLast?: boolean;
   isFirst?: boolean;
+  isConnected?: boolean;
 };
 
 const Message = forwardRef<HTMLDivElement, Message>(
-  ({ message, isFirst, isLast, createFeedback }, ref) => {
+  ({ message, isFirst, isLast, isConnected, createFeedback }, ref) => {
     const [feedback, setFeedback] = useState<'like' | 'dislike' | undefined>();
 
     const containerClass = cx('flex w-full', {
@@ -61,7 +62,7 @@ const Message = forwardRef<HTMLDivElement, Message>(
           ) : (
             <p>
               {message.message}
-              <span className={cx({ hidden: isFirst || !isLast })}>
+              <span className={cx({ hidden: isFirst || !isLast || !isConnected })}>
                 <button
                   className='absolute top-0 -right-5'
                   onClick={() => handleFeedback('like')}
@@ -97,8 +98,7 @@ const Message = forwardRef<HTMLDivElement, Message>(
 
 const Dialog: React.FC = () => {
   const [messages] = useAtom(messageAtom);
-  const [{ totalDislikes, messenger }, setConnection] =
-    useAtom(connectionAtom);
+  const [{ totalDislikes, messenger, connected }, setConnection] = useAtom(connectionAtom);
   const [isEscalated, setIsEscalated] = useState(false);
 
   const { mutate: createFeedback } = useMutation({
@@ -143,6 +143,7 @@ const Dialog: React.FC = () => {
           message={message}
           isFirst={index === 0}
           isLast={index === arr.length - 1}
+          isConnected={connected}
           createFeedback={createFeedback}
           ref={lastMessageRef}
         />
