@@ -10,7 +10,7 @@ import { connectionAtom } from '../state/atoms';
 const Input: React.FC = () => {
   const [input, setInput] = useState('');
   const [filler, setFiller] = useState('');
-  const [{ messenger }] = useAtom(connectionAtom);
+  const [{ messenger, timedOut, connected }] = useAtom(connectionAtom);
 
   const { listening, toggleListening, transcript, interim } = useSpeechRecognition();
 
@@ -54,6 +54,7 @@ const Input: React.FC = () => {
         </p>
       ) : (
         <textarea
+          disabled={timedOut || !connected}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           value={input}
@@ -76,7 +77,7 @@ const Input: React.FC = () => {
       )}
 
       <div className='flex items-center gap-1 md:gap-5'>
-        <button type='button' onClick={toggleListening}>
+        <button type='button' onClick={toggleListening} disabled={timedOut || !connected}>
           {listening ? (
             <div>
               <Bars height='20' width='40' color='green' ariaLabel='bars-loading' visible={true} />
@@ -88,7 +89,7 @@ const Input: React.FC = () => {
 
         <button
           type='submit'
-          disabled={input.length < 1}
+          disabled={input.length < 1 || timedOut || !connected}
           onClick={handleSubmit}
           className='w-12 md:w-24 h-12 flex items-center justify-center gap-3 bg-yellow-300 shadow-xl mr-1 rounded-md  hover:bg-yellow-400 disabled:hover:bg-yellow-300 disabled:cursor-not-allowed'
         >
