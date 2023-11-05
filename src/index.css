@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-*[class*='dark'] {
+/* *[class*='dark:bg-'] {
   transition: 0.4s;
-}
+} */
 
 .vh-gradient {
   background-image: linear-gradient(

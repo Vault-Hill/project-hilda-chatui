@@ -32,18 +32,16 @@ const Header: React.FC<Props> = ({ agentName }) => {
                 wrapperClass='radio-wrapper'
               />
             ) : (
-              <div className='relative'>
-                <img src={wifiIcon} className='h-5 w-5 dark:invert-[100%]' alt='' />
-                <img src={cancelIcon} className='h-5 w-5 absolute top-0' alt='' />
+              <div className='relative flex gap-x-3 '>
+                <section>
+                  <img src={wifiIcon} className='h-5 w-5 dark:invert-[100%]' alt='' />
+                  <img src={cancelIcon} className='h-5 w-5 absolute top-0' alt='' />
+                </section>
+                <p className='leading-5 text-sm text-rose-500'>Your chat session has ended due to inactivity.</p>
               </div>
             )}
           </div>
         </div>
-        {/* <div className='flex h-full'>
-      <button className='px-2 py-1 bg-rose-100 rounded-md border border-red-500 text-sm'>
-        Clear
-      </button>
-    </div> */}
       </div>
     </>
   );

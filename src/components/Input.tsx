@@ -10,7 +10,7 @@ import { connectionAtom } from '../state/atoms';
 const Input: React.FC = () => {
   const [input, setInput] = useState('');
   const [filler, setFiller] = useState('');
-  const [{ messenger, timedOut, connected }] = useAtom(connectionAtom);
+  const [{ messenger, timedOut, connected, reconnect }] = useAtom(connectionAtom);
 
   const { listening, toggleListening, transcript, interim } = useSpeechRecognition();
 
@@ -76,27 +76,42 @@ const Input: React.FC = () => {
         />
       )}
 
-      <div className='flex items-center gap-1 md:gap-5'>
-        <button type='button' onClick={toggleListening} disabled={timedOut || !connected}>
-          {listening ? (
-            <div>
-              <Bars height='20' width='40' color='green' ariaLabel='bars-loading' visible={true} />
-            </div>
-          ) : (
-            <img src={micOffIcon} className='h-8 w-8 mx-1' alt='' />
-          )}
-        </button>
+      {!timedOut && connected ? (
+        <div className='flex items-center gap-1 md:gap-5'>
+          <button type='button' onClick={toggleListening} disabled={timedOut || !connected}>
+            {listening ? (
+              <div>
+                <Bars
+                  height='20'
+                  width='40'
+                  color='green'
+                  ariaLabel='bars-loading'
+                  visible={true}
+                />
+              </div>
+            ) : (
+              <img src={micOffIcon} className='h-8 w-8 mx-1' alt='' />
+            )}
+          </button>
 
+          <button
+            type='submit'
+            disabled={input.length < 1}
+            onClick={handleSubmit}
+            className='w-12 md:w-24 h-12 flex items-center justify-center gap-3 bg-yellow-300 shadow-xl mr-1 rounded-md  hover:bg-yellow-400 disabled:hover:bg-yellow-300 disabled:cursor-not-allowed'
+          >
+            <span className='text-4 hidden md:block'>Send</span>
+            <img src={sendIcon} className='h-4 w-4' alt='send icon' />
+          </button>
+        </div>
+      ) : (
         <button
-          type='submit'
-          disabled={input.length < 1 || timedOut || !connected}
-          onClick={handleSubmit}
-          className='w-12 md:w-24 h-12 flex items-center justify-center gap-3 bg-yellow-300 shadow-xl mr-1 rounded-md  hover:bg-yellow-400 disabled:hover:bg-yellow-300 disabled:cursor-not-allowed'
+          className='bg-yellow-300 h-12 rounded-md px-5 hover:bg-yellow-400 shadow-xl'
+          onClick={reconnect}
         >
-          <span className='text-4 hidden md:block'>Send</span>
-          <img src={sendIcon} className='h-4 w-4' alt='send icon' />
+          Start New Chat
         </button>
-      </div>
+      )}
     </div>
   );
 };

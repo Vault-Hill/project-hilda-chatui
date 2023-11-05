@@ -97,7 +97,7 @@ const Message = forwardRef<HTMLDivElement, Message>(
 
 const Dialog: React.FC = () => {
   const [messages] = useAtom(messageAtom);
-  const [{ connected, totalDislikes, messenger, reconnect, timedOut }, setConnection] =
+  const [{ totalDislikes, messenger }, setConnection] =
     useAtom(connectionAtom);
   const [isEscalated, setIsEscalated] = useState(false);
 
@@ -147,14 +147,6 @@ const Dialog: React.FC = () => {
           ref={lastMessageRef}
         />
       ))}
-      {!connected && timedOut && (
-        <button
-          onClick={reconnect}
-          className='absolute bottom-20 -translate-x-1/2 left-1/2 bg-rose-200 hover:bg-rose-100 p-3 border border-red-500'
-        >
-          Start New Chat
-        </button>
-      )}
     </div>
   );
 };
