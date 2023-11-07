@@ -6,7 +6,7 @@ import { Command, MessageType, Messenger } from '../types';
 type Connection = {
   orgId?: string;
   totalDislikes?: number;
-  escalation?: string;
+  adhoc?: string;
   agentName?: string;
   logoUrl?: string;
   connected?: boolean;
@@ -19,6 +19,7 @@ type Connection = {
 export const messageAtom = atom<MessageType[]>([]);
 export const accessKeyAtom = atomWithStorage<string>('acc_key', '');
 export const connectionAtom = atomWithStorage<Connection>('connection', {});
+export const formAtom = atomWithStorage<string>('form', '');
 const socketAtom = atom<WebSocket | null>(null);
 
 export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
@@ -57,11 +58,15 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
       const data = processEvent(event);
 
       if (data) {
-        const { message, orgId, sessionId, agentName, logoUrl, role, timestamp } = data;
+        const { message, orgId, sessionId, agentName, logoUrl, role, timestamp, form } = data;
 
         if (!message) {
           set(messageAtom, (prev) => prev.slice(0, -1));
           return;
+        }
+
+        if (form) {
+          set(formAtom, JSON.stringify(form));
         }
 
         set(connectionAtom, (prev) => ({ ...prev, orgId, agentName, logoUrl }));
@@ -79,8 +84,8 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
     };
 
     const messenger = {
-      send: (command: Command) => {
-        const { orgId, totalDislikes, agentName, escalation } = get(connectionAtom);
+      call: (command: Command) => {
+        const { orgId, totalDislikes, agentName, adhoc } = get(connectionAtom);
 
         const message: MessageType = {
           timestamp: new Date().toISOString(),
@@ -97,26 +102,19 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
           action: command.action,
           orgId,
           agentName,
-          escalation,
           totalDislikes,
-          data: { message: command.message },
+          adhoc: command?.adhoc || adhoc,
+          data: { message: command?.message },
         };
 
-        set(messageAtom, (prev) => [...prev, message, typing]);
-        socket?.send(JSON.stringify(query));
-      },
-      escalate: (command: Command) => {
-        const { orgId, agentName, escalation } = get(connectionAtom);
+        if (!command.ghost) {
+          set(messageAtom, (prev) => [...prev, message, typing]);
+        }
 
-        const query = {
-          action: command.action,
-          orgId,
-          agentName,
-          escalation: escalation ?? 'Level 1',
-          data: { message: command.message },
-        };
+        if (command.ghost) {
+          set(messageAtom, (prev) => [...prev, typing]);
+        }
 
-        set(connectionAtom, (prev) => ({ ...prev, escalation: query.escalation }));
         socket?.send(JSON.stringify(query));
       },
     };

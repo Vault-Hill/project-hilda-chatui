@@ -4,13 +4,24 @@ type EventData = {
   timestamp: string;
 };
 
+export type Field = {
+  element: string;
+  name: string;
+  type: 'text' | 'password' | 'number' | 'time' | 'email' | 'hidden' | 'date' | 'tel';
+  label: string;
+  value: string;
+};
+
+export type Form = { type: string; fields: Field[] };
+
 export type ChatEvent = {
   action: string;
   orgId: string;
   sessionId: string;
-  data: EventData;
   agentName: string;
   logoUrl: string;
+  form?: Form;
+  data: EventData;
 };
 
 export type MessageType = {
@@ -22,9 +33,8 @@ export type MessageType = {
   typing?: boolean;
 };
 
-export type Command = { action: 'prompt'; message: string };
+export type Command = { action: 'prompt'; message?: string; adhoc?: string; ghost?: boolean };
 
 export type Messenger = {
-  send: (command: Command) => void;
-  escalate: (command: Command) => void;
+  call: (command: Command) => void;
 };

@@ -119,9 +119,9 @@ const Dialog: React.FC = () => {
   useEffect(() => {
     if (isEscalated) {
       setIsEscalated(false);
-      messenger?.escalate({
+      messenger?.call({
         action: 'prompt',
-        message: 'Escalate: Level 1',
+        adhoc: 'escalate-level-1',
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
