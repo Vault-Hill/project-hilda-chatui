@@ -10,8 +10,6 @@ const HomePage = () => {
   const [{ connected, agentName, timedOut, logoUrl }] = useAtom(connectionAtom);
   const [accessKey] = useAtom(accessKeyAtom);
 
-  // console.log('timedOut', timedOut);
-
   if (!accessKey) {
     return <div>Landing Page</div>;
   }

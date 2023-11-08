@@ -19,7 +19,6 @@ const Header: React.FC<Props> = ({ agentName }) => {
     if (!sessionTtl) return;
     const currentTime = Date.now();
     const duration = sessionTtl - currentTime;
-    console.log('DURATION', duration);
 
     const timeout = setTimeout(() => {
       socket?.close();
