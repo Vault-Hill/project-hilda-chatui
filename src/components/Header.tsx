@@ -1,9 +1,10 @@
 import { useAtom } from 'jotai';
+import { useEffect } from 'react';
 import { Radio } from 'react-loader-spinner';
 import avatar from '../assets/avatar.png';
 import cancelIcon from '../assets/cancel.svg';
 import wifiIcon from '../assets/wifi.svg';
-import { connectionAtom } from '../state/atoms';
+import { connectionAtom, socketAtom } from '../state/atoms';
 
 type Props = {
   agentName: string;
@@ -11,7 +12,22 @@ type Props = {
 };
 
 const Header: React.FC<Props> = ({ agentName }) => {
-  const [{ connected }] = useAtom(connectionAtom);
+  const [{ connected, sessionTtl }] = useAtom(connectionAtom);
+  const [socket] = useAtom(socketAtom);
+
+  useEffect(() => {
+    if (!sessionTtl) return;
+    const currentTime = Date.now();
+    const duration = sessionTtl - currentTime;
+    console.log('DURATION', duration);
+
+    const timeout = setTimeout(() => {
+      socket?.close();
+    }, duration);
+
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionTtl]);
 
   return (
     <>
@@ -37,7 +53,9 @@ const Header: React.FC<Props> = ({ agentName }) => {
                   <img src={wifiIcon} className='h-5 w-5 dark:invert-[100%]' alt='' />
                   <img src={cancelIcon} className='h-5 w-5 absolute top-0' alt='' />
                 </section>
-                <p className='leading-5 text-sm text-rose-500'>Your chat session has ended due to inactivity.</p>
+                <p className='leading-5 text-sm text-rose-500'>
+                  Your chat session has ended due to inactivity.
+                </p>
               </div>
             )}
           </div>

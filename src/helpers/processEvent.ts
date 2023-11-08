@@ -1,6 +1,7 @@
 import { ChatEvent } from '../types';
 
 const processEvent = (event: MessageEvent<unknown>) => {
+  console.log('Event: ', event)
   if (typeof event.data !== 'string') {
     console.log('Event data is Invalid');
     return;
@@ -8,7 +9,9 @@ const processEvent = (event: MessageEvent<unknown>) => {
 
   const eventData: ChatEvent = JSON.parse(event.data);
 
-  const { action, orgId, sessionId, agentName, logoUrl, data, form } = eventData;
+  console.log('Event Data: ', eventData);
+
+  const { action, orgId, sessionId, agentName, logoUrl, data, form, sessionTtl } = eventData;
 
   const { message, role, timestamp } = data;
 
@@ -22,6 +25,7 @@ const processEvent = (event: MessageEvent<unknown>) => {
     role,
     timestamp,
     form,
+    sessionTtl,
   };
 };
 

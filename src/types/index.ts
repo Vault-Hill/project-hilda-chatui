@@ -21,6 +21,7 @@ export type ChatEvent = {
   agentName: string;
   logoUrl: string;
   form?: Form;
+  sessionTtl?: number;
   data: EventData;
 };
 
@@ -33,7 +34,12 @@ export type MessageType = {
   typing?: boolean;
 };
 
-export type Command = { action: 'prompt'; message?: string; adhoc?: string; ghost?: boolean };
+export type Command = {
+  action: 'prompt' | 'disconnect';
+  message?: string;
+  adhoc?: string;
+  ghost?: boolean;
+};
 
 export type Messenger = {
   call: (command: Command) => void;

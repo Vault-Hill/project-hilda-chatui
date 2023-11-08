@@ -14,13 +14,14 @@ type Connection = {
   reconnect?: () => void;
   disconnect?: () => void;
   messenger?: Messenger;
+  sessionTtl?: number;
 };
 
 export const messageAtom = atom<MessageType[]>([]);
 export const accessKeyAtom = atomWithStorage<string>('acc_key', '');
 export const connectionAtom = atomWithStorage<Connection>('connection', {});
 export const formAtom = atomWithStorage<string>('form', '');
-const socketAtom = atom<WebSocket | null>(null);
+export const socketAtom = atom<WebSocket | null>(null);
 
 export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
   let socket = get(socketAtom);
@@ -58,7 +59,7 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
       const data = processEvent(event);
 
       if (data) {
-        const { message, orgId, sessionId, agentName, logoUrl, role, timestamp, form } = data;
+        const { message, orgId, sessionId, agentName, logoUrl, role, timestamp, form, sessionTtl } = data;
 
         if (!message) {
           set(messageAtom, (prev) => prev.slice(0, -1));
@@ -69,7 +70,7 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
           set(formAtom, JSON.stringify(form));
         }
 
-        set(connectionAtom, (prev) => ({ ...prev, orgId, agentName, logoUrl }));
+        set(connectionAtom, (prev) => ({ ...prev, orgId, agentName, logoUrl, sessionTtl }));
 
         const response: MessageType = {
           orgId,
