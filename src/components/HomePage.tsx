@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { BallTriangle } from 'react-loader-spinner';
-import { accessKeyAtom, connectionAtom, createSocketAtom } from '../state/atoms';
+import { connectionAtom, createSocketAtom } from '../state/atoms';
 import Main from './Main';
 import Navbar from './Navbar';
 
@@ -8,11 +8,11 @@ const HomePage = () => {
   const [, createConnection] = useAtom(createSocketAtom);
   createConnection();
   const [{ connected, agentName, timedOut, logoUrl }] = useAtom(connectionAtom);
-  const [accessKey] = useAtom(accessKeyAtom);
+  // const [accessKey] = useAtom(accessKeyAtom);
 
-  if (!accessKey) {
-    return <div>Landing Page</div>;
-  }
+  // if (!accessKey) {
+  //   return <div>Landing Page</div>;
+  // }
 
   if (!connected && !timedOut && !agentName) {
     return (

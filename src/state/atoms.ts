@@ -29,10 +29,16 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
   set(accessKeyAtom, searchParams.get('token') || '');
   const accessKey = get(accessKeyAtom);
 
+  // TODO Ayesha accessKey
+  const AYESHA_ACCESS_KEY =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiVTJGc2RHVmtYMTlHcTV1SFJhZm9SSVRkbWFhZEI3bkt1Mkt6c0ZTaS9VaUdBbzh5UkhMOVFDeitKUVYzMEw3Z3NWbzRoV2x1SWxCMkJvS2NRcFhaTXE5c3ZKZG5ONkpybUtjZEJNemRTNW5ZejJ6cFNJYktnaktZOTJ3NVhlKzQiLCJpYXQiOjE2OTkxNzcyODUsImF1ZCI6Ik5pZ2NvbXNhdCBjdXN0b21lcnMiLCJpc3MiOiJWYXVsdCBIaWxsIn0.h21RQqHCzIkPUH56vW3ZOkRao8qQlKnpPw2xWcLXWww';
+
   const setup = () => {
     // console.log('connecting...');
     set(connectionAtom, {});
-    socket = new WebSocket(`${import.meta.env.VITE_WS_CONN_URL}?acc_key=${accessKey}`);
+    socket = new WebSocket(
+      `${import.meta.env.VITE_WS_CONN_URL}?acc_key=${accessKey ? accessKey : AYESHA_ACCESS_KEY}`,
+    );
     set(socketAtom, socket);
 
     socket.onopen = () => {
@@ -59,7 +65,8 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
       const data = processEvent(event);
 
       if (data) {
-        const { message, orgId, sessionId, agentName, logoUrl, role, timestamp, form, sessionTtl } = data;
+        const { message, orgId, sessionId, agentName, logoUrl, role, timestamp, form, sessionTtl } =
+          data;
 
         if (!message) {
           set(messageAtom, (prev) => prev.slice(0, -1));
