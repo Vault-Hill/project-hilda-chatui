@@ -5,12 +5,28 @@ type EventData = {
 };
 
 export type Field = {
+  head: string | null;
   element: string;
   name: string;
-  type: 'text' | 'password' | 'number' | 'time' | 'email' | 'hidden' | 'date' | 'tel';
   label: string;
-  value: string;
-};
+  type: 'text' | 'password' | 'number' | 'time' | 'email' | 'hidden' | 'date' | 'tel';
+  placeholder: string;
+  required?: boolean;
+  options?: { key: string; value: string }[];
+  optionsAsync?: {
+    url: string;
+  };
+  visibleIf?: {
+    field: string;
+    value: 'Other'; // The value to trigger visibility
+  };
+  validation?: {
+    minLength?: number;
+    maxLength?: number;
+    pattern?: string;
+  };
+  next?: string | null;
+}
 
 export type Form = { type: string; fields: Field[] };
 
