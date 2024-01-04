@@ -36,7 +36,7 @@ const Input: React.FC<Props> = ({
         type={type}
         {...(detached ? {} : register(name, validation))}
         className={classNames(
-          'w-full border overflow-hidden focus:ring-0 focus:outline-none px-4 py-2 disabled:text-neutral-500 disabled:bg-slate-100 disabled:hover:cursor-not-allowed',
+          'w-full border rounded-lg overflow-hidden border-white border-opacity-10 focus:ring-0 bg-white bg-opacity-10  focus:outline-none px-4 py-2 disabled:text-neutral-500 disabled:bg-slate-100 disabled:hover:cursor-not-allowed',
           className,
         )}
         {...props}
