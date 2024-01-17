@@ -1,7 +1,9 @@
 import { Getter, Setter, atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import processEvent from '../helpers/processEvent';
-import { Command, MessageType, Messenger } from '../types';
+import { ChatEventMetaData, Command, MessageType, Messenger, QueryData } from '../types';
+// import { Socket, io } from 'socket.io-client';
+import { objectOrString } from '../helpers';
 
 type Connection = {
   orgId?: string;
@@ -11,6 +13,7 @@ type Connection = {
   logoUrl?: string;
   connected?: boolean;
   timedOut?: boolean;
+  cues?: string[];
   reconnect?: () => void;
   disconnect?: () => void;
   messenger?: Messenger;
@@ -22,6 +25,8 @@ export const accessKeyAtom = atomWithStorage<string>('acc_key', '');
 export const connectionAtom = atomWithStorage<Connection>('connection', {});
 export const formAtom = atomWithStorage<string>('form', '');
 export const socketAtom = atom<WebSocket | null>(null);
+const metaDataAtom = atomWithStorage<ChatEventMetaData | null>('metadata', null)
+
 
 export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
   let socket = get(socketAtom);
@@ -29,15 +34,13 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
   set(accessKeyAtom, searchParams.get('token') || '');
   const accessKey = get(accessKeyAtom);
 
-  // TODO Ayesha accessKey
-  const AYESHA_ACCESS_KEY =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiVTJGc2RHVmtYMTlHcTV1SFJhZm9SSVRkbWFhZEI3bkt1Mkt6c0ZTaS9VaUdBbzh5UkhMOVFDeitKUVYzMEw3Z3NWbzRoV2x1SWxCMkJvS2NRcFhaTXE5c3ZKZG5ONkpybUtjZEJNemRTNW5ZejJ6cFNJYktnaktZOTJ3NVhlKzQiLCJpYXQiOjE2OTkxNzcyODUsImF1ZCI6Ik5pZ2NvbXNhdCBjdXN0b21lcnMiLCJpc3MiOiJWYXVsdCBIaWxsIn0.h21RQqHCzIkPUH56vW3ZOkRao8qQlKnpPw2xWcLXWww';
+  const ACCESS_KEY = import.meta.env.VITE_ACCESS_KEY;
 
   const setup = () => {
     // console.log('connecting...');
     set(connectionAtom, {});
     socket = new WebSocket(
-      `${import.meta.env.VITE_WS_CONN_URL}?acc_key=${accessKey ? accessKey : AYESHA_ACCESS_KEY}`,
+      `${import.meta.env.VITE_WS_CONN_URL}?access-key=${accessKey ? accessKey : ACCESS_KEY}`,
     );
     set(socketAtom, socket);
 
@@ -45,27 +48,28 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
       // console.log('connected');
       set(messageAtom, []);
       set(connectionAtom, { connected: true, reconnect, disconnect, messenger });
-    };
+    }
 
     socket.onclose = () => {
       // console.log('disconnected');
       set(connectionAtom, (prev) => ({ ...prev, connected: false, timedOut: true }));
 
       const response: MessageType = {
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().getMilliseconds(),
         role: 'assistant',
         message:
           "As you're no longer asking questions, I'll go ahead and close the session. Feel free to reach out later if you have more inquiries or need assistance. Thank you for using our service.",
+        cues: [],
       };
 
       set(messageAtom, (prev) => [...prev, response]);
-    };
+    }
 
     socket.onmessage = (event) => {
       const data = processEvent(event);
 
       if (data) {
-        const { message, orgId, sessionId, agentName, logoUrl, role, timestamp, form, sessionTtl } =
+        const { message, orgId, sessionId, agentName, logoUrl, role, timestamp, form, sessionTtl, metadata, cues } =
           data;
 
         if (!message) {
@@ -77,7 +81,7 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
           set(formAtom, JSON.stringify(form));
         }
 
-        set(connectionAtom, (prev) => ({ ...prev, orgId, agentName, logoUrl, sessionTtl }));
+        set(connectionAtom, (prev) => ({ ...prev, orgId, agentName, logoUrl, sessionTtl, cues }));
 
         const response: MessageType = {
           orgId,
@@ -85,18 +89,24 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
           timestamp,
           role,
           message,
+          cues
         };
 
+        set(metaDataAtom, metadata)
         set(messageAtom, (prev) => [...prev, response]);
       }
-    };
+    }
 
     const messenger = {
       call: (command: Command) => {
-        const { orgId, totalDislikes, agentName, adhoc } = get(connectionAtom);
+        const metaData = get(metaDataAtom);
+
+        if (!metaData) {
+          return socket?.close()
+        }
 
         const message: MessageType = {
-          timestamp: new Date().toISOString(),
+          timestamp: new Date().getMilliseconds(),
           role: 'user',
           message: command.message,
         };
@@ -106,13 +116,9 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
           typing: true,
         };
 
-        const query = {
-          action: command.action,
-          orgId,
-          agentName,
-          totalDislikes,
-          adhoc: command?.adhoc || adhoc,
-          data: { message: command?.message },
+        const query: QueryData = {
+          data: { message: command?.message ? objectOrString(command?.message) : undefined },
+          metadata: metaData
         };
 
         if (!command.ghost) {
@@ -123,7 +129,12 @@ export const createSocketAtom = atom(null, (get: Getter, set: Setter) => {
           set(messageAtom, (prev) => [...prev, typing]);
         }
 
-        socket?.send(JSON.stringify(query));
+        socket?.send(
+          JSON.stringify({
+            event: 'message',
+            data: query,
+          }),
+        );
       },
     };
   };

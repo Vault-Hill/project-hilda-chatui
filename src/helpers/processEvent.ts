@@ -8,21 +8,24 @@ const processEvent = (event: MessageEvent<unknown>) => {
 
   const eventData: ChatEvent = JSON.parse(event.data);
 
-  const { action, orgId, sessionId, agentName, logoUrl, data, form, sessionTtl } = eventData;
+  const { data, metadata } = eventData;
 
-  const { message, role, timestamp } = data;
+  const { message, timestamp } = data;
+
+  const { organization, session, botName, avatarUrl } = metadata
 
   return {
-    action,
-    orgId,
-    sessionId,
-    agentName,
-    logoUrl,
+    orgId: organization?.id,
+    sessionId: session?.id,
+    agentName: botName,
+    logoUrl: avatarUrl,
     message,
-    role,
+    role: 'assistant',
+    cues: data?.cues,
     timestamp,
-    form,
-    sessionTtl,
+    form: data?.form ?? null,
+    sessionTtl: session.ttl,
+    metadata,
   };
 };
 

@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
 import { Radio } from 'react-loader-spinner';
-import avatar from '../assets/avatar.png';
+import avatar from '/avatar.png';
 import cancelIcon from '../assets/cancel.svg';
 import wifiIcon from '../assets/wifi.svg';
 import { connectionAtom, socketAtom } from '../state/atoms';
