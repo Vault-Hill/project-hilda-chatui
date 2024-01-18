@@ -86,7 +86,7 @@ const Input: React.FC = () => {
 							rows={1}
 							tabIndex={0}
 							spellCheck={false}
-							className="flex-1 text-sm p-[10px] md:p-[13px] h-full outline-none overflow-hidden bg-white bg-opacity-10 rounded-[10px] border border-white border-opacity-10 resize-none disabled:hover:cursor-not-allowed"
+							className="flex-1 text-sm p-[10px] md:p-[13px] h-full outline-none overflow-hidden bg-white bg-opacity-10 rounded-[10px] border text-white border-white border-opacity-10 resize-none disabled:hover:cursor-not-allowed"
 							placeholder="Enter a message here"
 							ref={(textarea) => {
 								if (textarea) {
